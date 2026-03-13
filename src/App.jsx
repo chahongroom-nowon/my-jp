@@ -18,6 +18,14 @@ const App = () => {
   
   const scrollRef = useRef(null);
 
+  const [toast, setToast] = useState({ show: false, message: '' });
+
+// 토스트를 띄우는 함수
+const showToast = (msg) => {
+  setToast({ show: true, message: msg });
+  setTimeout(() => setToast({ show: false, message: '' }), 2000); // 2초 뒤 사라짐
+};
+
   // 1. [Firebase] 데이터 불러오기 (PC/폰 동기화)
   useEffect(() => {
     const fetchWords = async () => {
@@ -127,7 +135,7 @@ const App = () => {
   };
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => {
-      alert(`복사 완료: ${text}`);
+      showToast(`복사 완료: ${text}`); // 이 부분 수정
     }).catch(err => {
       console.error('복사 실패:', err);
     });
@@ -223,8 +231,16 @@ const App = () => {
         </div>
       </aside>
       {isSidebarOpen && <div onClick={() => setSidebarOpen(false)} className="fixed inset-0 bg-black/30 z-40 md:hidden backdrop-blur-sm" />}
+        {/* 토스트 알림 UI */}
+{toast.show && (
+  <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] bg-slate-800 text-white px-6 py-3 rounded-full shadow-lg text-sm font-medium animate-bounce-in">
+    {toast.message}
+  </div>
+)}
     </div>
+    
   );
+  
 };
 
 export default App;
