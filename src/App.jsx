@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageCircle, BookMarked, Send, ChevronRight, PlusCircle, Trash2 } from 'lucide-react';
+import { MessageCircle, BookMarked, Send, ChevronRight, PlusCircle, Trash2, Copy } from 'lucide-react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 // 아까 만든 firebase.js에서 db를 가져옵니다.
 import { db } from './firebase'; 
@@ -125,6 +125,13 @@ const App = () => {
       console.error("삭제 에러:", error);
     }
   };
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert(`복사 완료: ${text}`);
+    }).catch(err => {
+      console.error('복사 실패:', err);
+    });
+  };
 
   return (
     <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden font-sans">
@@ -185,16 +192,29 @@ const App = () => {
             <span className="flex items-center gap-2"><BookMarked className="text-indigo-600" /> 와타시 메모장</span>
           </h2>
           <div className="space-y-4">
-            {quickWords.map((item) => (
+                      {quickWords.map((item) => (
               <div key={item.id} className="relative p-4 rounded-xl bg-slate-50 border border-slate-100 group">
+                {/* 삭제 버튼 */}
                 <button 
                   onClick={() => removeWord(item.id)}
-                  className="absolute top-2 right-2 text-slate-300 hover:text-red-400"
+                  className="absolute top-2 right-2 text-slate-300 hover:text-red-400 transition-colors"
                 >
                   <Trash2 size={14} />
                 </button>
+
+                {/* 복사 버튼 추가 */}
+                <button 
+                  onClick={() => copyToClipboard(item.input)}
+                  className="absolute top-2 right-8 text-slate-300 hover:text-indigo-500 transition-colors"
+                  title="입력방법 복사"
+                >
+                  <Copy size={14} />
+                </button>
+
                 <div className="font-bold text-indigo-700 mb-1">{item.word}</div>
-                <div className="text-[11px] text-slate-500 font-mono bg-white px-2 py-0.5 rounded border border-slate-100 inline-block">{item.input}</div>
+                <div className="text-[11px] text-slate-500 font-mono bg-white px-2 py-0.5 rounded border border-slate-100 inline-block">
+                  {item.input}
+                </div>
                 <div className="text-xs text-slate-700 mt-2 font-semibold">발음: {item.pronounce}</div>
                 <div className="text-[11px] text-slate-400 mt-2 leading-relaxed">{item.desc}</div>
               </div>
